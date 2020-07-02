@@ -1696,6 +1696,8 @@ struct rtw_dev {
 
 	enum rtw_trx_mode trx_mode;
 
+	bool debug;
+
 	/* ensures exclusive access from mac80211 callbacks */
 	struct mutex mutex;
 
