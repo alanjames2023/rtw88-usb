@@ -494,7 +494,7 @@ static void rtw_usb_indicate_tx_status(struct rtw_dev *rtwdev,
 	ieee80211_tx_status_irqsafe(hw, skb);
 }
 
-static void rtw_usb_write_port_direct_complete(struct urb *urb)
+static void rtw_usb_write_port_complete(struct urb *urb)
 {
 	struct sk_buff *skb;
 
@@ -502,8 +502,8 @@ static void rtw_usb_write_port_direct_complete(struct urb *urb)
 	dev_kfree_skb_any(skb);
 }
 
-static int rtw_usb_write_port_direct(struct rtw_dev *rtwdev, u8 addr, u32 cnt,
-				     struct sk_buff *skb)
+static int rtw_usb_write_port(struct rtw_dev *rtwdev, u8 addr, u32 cnt,
+			      struct sk_buff *skb, usb_complete_t cb)
 {
 	struct rtw_usb *rtwusb = rtw_get_usb_priv(rtwdev);
 	struct usb_device *usbd = rtwusb->udev;
@@ -517,7 +517,7 @@ static int rtw_usb_write_port_direct(struct rtw_dev *rtwdev, u8 addr, u32 cnt,
 		return -ENOMEM;
 
 	usb_fill_bulk_urb(urb, usbd, pipe, skb->data, (int)cnt,
-			  rtw_usb_write_port_direct_complete, skb);
+			  cb, skb);
 	ret = usb_submit_urb(urb, GFP_ATOMIC);
 	if (unlikely(ret))
 		rtw_err(rtwdev, "failed to submit write urb, ret=%d\n", ret);
@@ -704,9 +704,10 @@ static int rtw_usb_write_data(struct rtw_dev *rtwdev,
 	rtw_tx_fill_tx_desc(pkt_info, skb);
 	chip->ops->fill_txdesc_checksum(rtwdev, pkt_info, skb->data);
 	queue = rtw_tx_qsel_to_queue(rtwdev, qsel);
-	ret = rtw_usb_write_port_direct(rtwdev, queue, len, skb);
+	ret = rtw_usb_write_port(rtwdev, queue, len, skb,
+				 rtw_usb_write_port_complete);
 	if (unlikely(ret))
-		rtw_err(rtwdev, "failed to do USB write async, ret=%d\n", ret);
+		rtw_err(rtwdev, "failed to do USB write, ret=%d\n", ret);
 
 	return ret;
 }
