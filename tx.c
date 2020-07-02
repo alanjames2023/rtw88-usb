@@ -484,6 +484,7 @@ void rtw_tx_tasklet(unsigned long data)
 	struct rtw_txq *rtwtxq, *tmp;
 
 	spin_lock_bh(&rtwdev->txq_lock);
+	//rtwdev->debug = true;
 
 	list_for_each_entry_safe(rtwtxq, tmp, &rtwdev->txqs, list) {
 		struct ieee80211_txq *txq = rtwtxq_to_txq(rtwtxq);
@@ -496,6 +497,7 @@ void rtw_tx_tasklet(unsigned long data)
 		list_del_init(&rtwtxq->list);
 	}
 
+	//rtwdev->debug = false;
 	spin_unlock_bh(&rtwdev->txq_lock);
 }
 

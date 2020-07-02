@@ -767,6 +767,13 @@ static int rtw_usb_tx_write(struct rtw_dev *rtwdev,
 	if (!pkt_info)
 		return -EINVAL;
 
+/*
+	if (rtwdev->debug) {
+		pr_info("%s: in_interrupt:%lu\n", __func__, in_interrupt());
+		pr_info("%s: in_atomic:%u\n", __func__, in_atomic());
+	}
+*/
+
 	pkt_desc = skb_push(skb, chip->tx_pkt_desc_sz);
 	memset(pkt_desc, 0, chip->tx_pkt_desc_sz);
 	pkt_info->qsel = rtw_tx_queue_to_qsel(skb, queue);
