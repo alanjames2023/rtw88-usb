@@ -579,10 +579,8 @@ static struct rtw_usb_txcb_t *rtw_usb_txcb_init(struct rtw_dev *rtwdev)
 	struct rtw_usb_txcb_t *txcb;
 
 	txcb = kmalloc(sizeof(*txcb), GFP_ATOMIC);
-	if (!txcb) {
-		rtw_err(rtwdev, "failed to allocate for txcb\n");
+	if (!txcb)
 		return NULL;
-	}
 
 	txcb->rtwdev = rtwdev;
 	skb_queue_head_init(&txcb->tx_ack_queue);
@@ -793,13 +791,6 @@ static int rtw_usb_tx_write(struct rtw_dev *rtwdev,
 	if (!pkt_info)
 		return -EINVAL;
 
-/*
-	if (rtwdev->debug) {
-		pr_info("%s: in_interrupt:%lu\n", __func__, in_interrupt());
-		pr_info("%s: in_atomic:%u\n", __func__, in_atomic());
-	}
-*/
-
 	pkt_desc = skb_push(skb, chip->tx_pkt_desc_sz);
 	memset(pkt_desc, 0, chip->tx_pkt_desc_sz);
 	pkt_info->qsel = rtw_tx_queue_to_qsel(skb, queue);
@@ -928,14 +919,12 @@ static void rtw_usb_read_port(struct rtw_dev *rtwdev, u8 addr,
 	u32 len;
 	int ret;
 
-
 	urb = usb_alloc_urb(0, GFP_ATOMIC);
 	if (!urb)
 		return;
 
 	rxcb->data = (void *)rtwdev;
 	pipe = rtw_usb_get_pipe(rtwusb, RTW_USB_BULK_IN_ADDR);
-
 	len = RTW_USB_MAX_RECVBUF_SZ + RTW_USB_RECVBUFF_ALIGN_SZ;
 	skb = dev_alloc_skb(len);
 	if (!skb) {
@@ -982,7 +971,6 @@ static void rtw_usb_inirp_init(struct rtw_dev *rtwdev)
 	}
 
 	rtw_usb_set_bus_ready(rtwdev, true);
-	return;
 }
 
 static void rtw_usb_inirp_deinit(struct rtw_dev *rtwdev)
