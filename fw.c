@@ -317,8 +317,18 @@ static void rtw_fw_send_h2c_command(struct rtw_dev *rtwdev,
 		goto out;
 	}
 
-	rtw_write32(rtwdev, box_ex_reg, le32_to_cpu(h2c_cmd->msg_ext));
-	rtw_write32(rtwdev, box_reg, le32_to_cpu(h2c_cmd->msg));
+	switch (rtw_hci_type(rtwdev)) {
+	case RTW_HCI_TYPE_USB:
+		rtw_write32_async(rtwdev, box_ex_reg,
+				  le32_to_cpu(h2c_cmd->msg_ext));
+		rtw_write32_async(rtwdev, box_reg, le32_to_cpu(h2c_cmd->msg));
+		break;
+	case RTW_HCI_TYPE_PCIE:
+	default:
+		rtw_write32(rtwdev, box_ex_reg, le32_to_cpu(h2c_cmd->msg_ext));
+		rtw_write32(rtwdev, box_reg, le32_to_cpu(h2c_cmd->msg));
+		break;
+	}
 
 	if (++rtwdev->h2c.last_box_num >= 4)
 		rtwdev->h2c.last_box_num = 0;

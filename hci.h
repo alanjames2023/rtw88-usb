@@ -27,6 +27,7 @@ struct rtw_hci_ops {
 	void (*write8)(struct rtw_dev *rtwdev, u32 addr, u8 val);
 	void (*write16)(struct rtw_dev *rtwdev, u32 addr, u16 val);
 	void (*write32)(struct rtw_dev *rtwdev, u32 addr, u32 val);
+	void (*write32_async)(struct rtw_dev *rtwdev, u32 addr, u32 val);
 };
 
 static inline int rtw_hci_tx_write(struct rtw_dev *rtwdev,
@@ -111,6 +112,11 @@ static inline void rtw_write16(struct rtw_dev *rtwdev, u32 addr, u16 val)
 static inline void rtw_write32(struct rtw_dev *rtwdev, u32 addr, u32 val)
 {
 	rtwdev->hci.ops->write32(rtwdev, addr, val);
+}
+
+static inline void rtw_write32_async(struct rtw_dev *rtwdev, u32 addr, u32 val)
+{
+	rtwdev->hci.ops->write32_async(rtwdev, addr, val);
 }
 
 static inline void rtw_write8_set(struct rtw_dev *rtwdev, u32 addr, u8 bit)

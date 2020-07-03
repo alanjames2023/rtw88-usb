@@ -49,6 +49,76 @@ static void rtw_usb_fill_tx_checksum(struct rtw_usb *rtwusb,
  * usb read/write register functions
  */
 
+static void rtw_usb_ctrl_async_cb(struct urb *urb)
+{
+	if (!urb)
+		return;
+
+	/* free dr */
+	kfree(urb->setup_packet);
+	/* free databuf */
+	kfree(urb->transfer_buffer);
+}
+
+static int rtw_usb_ctrl_write_async(struct rtw_dev *rtwdev,
+				    struct usb_device *dev, unsigned int pipe,
+				    __u16 value, __u16 index,
+				    void *databuf, __u16 size)
+{
+	struct usb_ctrlrequest *dr = NULL;
+	struct urb *urb = NULL;
+	int ret = -ENOMEM;
+
+	dr = kmalloc(sizeof(struct usb_ctrlrequest), GFP_ATOMIC);
+	if (!dr)
+		goto err_free_databuf;
+
+	dr->bRequestType = RTW_USB_CMD_REQ;
+	dr->bRequest = RTW_USB_CMD_WRITE;
+	dr->wValue = cpu_to_le16(value);
+	dr->wIndex = cpu_to_le16(index);
+	dr->wLength = cpu_to_le16(size);
+
+	urb = usb_alloc_urb(0, GFP_ATOMIC);
+	if (!urb)
+		goto err_free_dr;
+
+	usb_fill_control_urb(urb, dev, pipe, (unsigned char *)dr, databuf, size,
+			     rtw_usb_ctrl_async_cb, NULL);
+	ret = usb_submit_urb(urb, GFP_ATOMIC);
+	if (unlikely(ret)) {
+		rtw_err(rtwdev, "failed to submit urb, ret=%d\n", ret);
+		goto err_free_urb;
+	}
+	usb_free_urb(urb);
+	return 0;
+
+err_free_urb:
+	usb_free_urb(urb);
+err_free_dr:
+	kfree(dr);
+err_free_databuf:
+	kfree(databuf);
+	return ret;
+}
+
+static void rtw_usb_write32_async(struct rtw_dev *rtwdev, u32 addr, u32 val)
+{
+	struct rtw_usb *rtwusb = (struct rtw_usb *)rtwdev->priv;
+	struct usb_device *udev = rtwusb->udev;
+	__le32 *buf;
+
+	/* cannot use mutex_lock in atomic */
+	buf = kmalloc(sizeof(*buf), GFP_ATOMIC);
+	if (!buf) {
+		rtw_err(rtwdev, "failed to alloc memory\n");
+		return;
+	}
+	*buf = cpu_to_le32(val);
+	rtw_usb_ctrl_write_async(rtwdev, udev, usb_sndctrlpipe(udev, 0),
+				 addr, 0, buf, sizeof(*buf));
+}
+
 static u8 rtw_usb_read8(struct rtw_dev *rtwdev, u32 addr)
 {
 	struct rtw_usb *rtwusb = (struct rtw_usb *)rtwdev->priv;
@@ -186,6 +256,7 @@ static void rtw_usb_write32(struct rtw_dev *rtwdev, u32 addr, u32 val)
 	kfree(buf);
 	mutex_unlock(&rtwusb->usb_buf_mutex);
 }
+
 
 static int rtw_usb_parse(struct rtw_dev *rtwdev,
 			 struct usb_interface *interface)
@@ -1038,6 +1109,7 @@ static struct rtw_hci_ops rtw_usb_ops = {
 	.write8 = rtw_usb_write8,
 	.write16 = rtw_usb_write16,
 	.write32 = rtw_usb_write32,
+	.write32_async = rtw_usb_write32_async,
 
 	.write_data_rsvd_page = rtw_usb_write_data_rsvd_page,
 	.write_data_h2c = rtw_usb_write_data_h2c,
