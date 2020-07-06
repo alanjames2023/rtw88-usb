@@ -1745,8 +1745,6 @@ struct rtw_dev {
 	struct rtw_fw_state wow_fw;
 	struct rtw_wow_param wow;
 
-	struct list_head vif_ramaskq;
-
 	bool need_rfk;
 
 	/* hci related data, must be last */
