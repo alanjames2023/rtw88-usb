@@ -1,0 +1,46 @@
+[ 1574.871542] wlan1: Aggregation is on for f4:f2:6d:ca:ef:98 tid 0
+[ 1574.913970] rtwifi_usb 2-1:1.2: rtw_iterate_stas_atomic
+[ 1574.913997] ------------[ cut here ]------------
+[ 1574.914010] WARNING: CPU: 1 PID: 1580 at kernel/rcu/tree_plugin.h:293 rcu_note_context_switch+0x49/0x480
+[ 1574.914012] Modules linked in: cmac rtwusb(OE) rtw88(OE) ipheth overlay bnep binfmt_misc intel_rapl_msr intel_rapl_common x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel aesni_intel crypto_simd snd_hda_codec_hdmi snd_hda_codec_realtek cryptd dell_laptop glue_helper snd_hda_codec_generic snd_hda_intel snd_intel_dspcfg snd_hda_codec snd_hda_core uvcvideo ledtrig_audio snd_hwdep videobuf2_vmalloc dell_smm_hwmon snd_pcm videobuf2_memops intel_cstate snd_seq_midi videobuf2_v4l2 snd_seq_midi_event intel_rapl_perf videobuf2_common snd_rawmidi videodev mc iwlmvm mac80211 snd_seq libarc4 dell_wmi snd_seq_device dell_smbios snd_timer nouveau snd dcdbas joydev sparse_keymap input_leds dell_wmi_descriptor serio_raw soundcore i915 wmi_bmof ttm btusb iwlwifi btrtl cec drm_kms_helper drm btbcm cfg80211 i2c_algo_bit fb_sys_fops syscopyarea btintel bluetooth sysfillrect ecdh_generic ecc sysimgblt lpc_ich mei_me acpi_pad mei dell_rbtn
+[ 1574.914089]  mxm_wmi mac_hid sch_fq_codel parport_pc ppdev lp parport ip_tables x_tables autofs4 psmouse ahci r8169 libahci realtek i2c_hid wmi video hid
+[ 1574.914108] CPU: 1 PID: 1580 Comm: kworker/u8:12 Tainted: G           OE     5.5.6 #1
+[ 1574.914111] Hardware name: Dell Inc. Inspiron 5558/0WMF3P, BIOS A02 03/09/2015
+[ 1574.914125] Workqueue: phy1 rtw_watch_dog_work [rtw88]
+[ 1574.914132] RIP: 0010:rcu_note_context_switch+0x49/0x480
+[ 1574.914137] Code: 4c 8b 24 25 c0 8b 01 00 48 03 2c c5 20 99 9c a9 0f 1f 44 00 00 45 84 f6 0f 85 16 01 00 00 41 8b 94 24 70 07 00 00 85 d2 7e 11 <0f> 0b 41 80 bc 24 74 07 00 00 00 0f 84 18 01 00 00 4c 89 e7 e8 2e
+[ 1574.914140] RSP: 0018:ffffb32b01b0fab8 EFLAGS: 00010002
+[ 1574.914143] RAX: 0000000000000001 RBX: ffff88a1eb4acac0 RCX: 0000000000000001
+[ 1574.914145] RDX: 0000000000000001 RSI: ffffffffa91bf466 RDI: 0000000000000000
+[ 1574.914147] RBP: ffff88a1eb4ad7c0 R08: 0000000000000070 R09: 0000000000000800
+[ 1574.914150] R10: 0000000000000001 R11: 0000000000010c04 R12: ffff88a1e9d62e80
+[ 1574.914152] R13: ffff88a1e9d62e80 R14: 0000000000000000 R15: 000000000002cac0
+[ 1574.914155] FS:  0000000000000000(0000) GS:ffff88a1eb480000(0000) knlGS:0000000000000000
+[ 1574.914158] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1574.914160] CR2: 000056192cc3dce0 CR3: 00000000b280a001 CR4: 00000000003606e0
+[ 1574.914162] Call Trace:
+[ 1574.914173]  __schedule+0x9b/0x760
+[ 1574.914179]  ? _raw_spin_lock_irqsave+0x25/0x50
+[ 1574.914184]  schedule+0x46/0xf0
+[ 1574.914188]  schedule_timeout+0x162/0x300
+[ 1574.914193]  ? usb_hcd_submit_urb+0xad/0xa90
+[ 1574.914199]  ? __next_timer_interrupt+0xc0/0xc0
+[ 1574.914204]  wait_for_completion_timeout+0xa3/0x130
+[ 1574.914209]  ? wake_up_q+0xa0/0xa0
+[ 1574.914214]  usb_start_wait_urb+0x82/0x160
+[ 1574.914219]  usb_control_msg+0xdd/0x140
+[ 1574.914227]  rtw_usb_read8+0x74/0xb0 [rtwusb]
+[ 1574.914245]  rtw_fw_send_h2c_command+0xe5/0x1d0 [rtw88]
+[ 1574.914260]  ? rtw_mac_init+0x7a0/0x7a0 [rtw88]
+[ 1574.914274]  rtw_fw_send_rssi_info+0x66/0x80 [rtw88]
+[ 1574.914286]  rtw_phy_stat_rssi_iter+0x8c/0xc0 [rtw88]
+[ 1574.914346]  ieee80211_iterate_stations_atomic+0x4b/0x60 [mac80211]
+[ 1574.914360]  rtw_phy_dynamic_mechanism+0x5a/0x6b0 [rtw88]
+[ 1574.914371]  rtw_watch_dog_work+0x1b5/0x250 [rtw88]
+[ 1574.914379]  process_one_work+0x1e7/0x3f0
+[ 1574.914386]  worker_thread+0x49/0x3e0
+[ 1574.914393]  ? process_one_work+0x3f0/0x3f0
+[ 1574.914397]  kthread+0xf8/0x130
+[ 1574.914402]  ? kthread_create_worker_on_cpu+0x70/0x70
+[ 1574.914408]  ret_from_fork+0x35/0x40
+[ 1574.914415] ---[ end trace ac48f8b5c8dd0e76 ]---
