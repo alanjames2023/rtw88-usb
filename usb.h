@@ -94,7 +94,7 @@ struct rtw_usb {
 	struct rtw_dev *rtwdev;
 	struct usb_device *udev;
 
-	struct mutex usb_buf_mutex; /* mutex for usb_buf */
+	struct mutex usb_mutex; /* mutex for usb_buf */
 
 	u32 bulkout_size;
 	u8 num_in_pipes;

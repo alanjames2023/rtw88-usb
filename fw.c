@@ -308,6 +308,11 @@ static void rtw_fw_send_h2c_command(struct rtw_dev *rtwdev,
 		goto out;
 	}
 
+	if (in_interrupt())
+		pr_err("%s: in interrupt\n", __func__);
+	if (in_atomic())
+		pr_err("%s: in atomic\n", __func__);
+
 	switch (rtw_hci_type(rtwdev)) {
 	case RTW_HCI_TYPE_USB:
 		ret = read_poll_timeout_atomic(rtw_read8_atomic, box_state,
